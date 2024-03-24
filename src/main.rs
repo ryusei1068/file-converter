@@ -1,6 +1,6 @@
-use std::env::{self, args};
+use std::env;
 use std::fs::File;
-use std::io::{self, BufReader, BufWriter, Read, Write};
+use std::io::{BufReader, BufWriter, Read, Write};
 use std::process::exit;
 
 fn read_file(path: &String) -> String {
@@ -15,7 +15,6 @@ fn read_file(path: &String) -> String {
     let mut reader = BufReader::new(file);
 
     let mut buf = String::new();
-
     match reader.read_to_string(&mut buf) {
         Err(e) => {
             eprintln!("Failed to read. {:?}", e);
@@ -44,6 +43,7 @@ fn write_html(path: &String, html: &String) {
             exit(1)
         }
     };
+
     let mut buffer = BufWriter::new(file);
     match buffer.write_all(html.as_bytes()) {
         Err(e) => {
@@ -57,10 +57,15 @@ fn write_html(path: &String, html: &String) {
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let input_path = &args[1];
-    let output_path = &args[2];
-    let buf = read_file(input_path);
+    if args.len() == 3 {
+        let input_path = &args[1];
+        let output_path = &args[2];
 
-    let html = md_parse(&buf);
-    write_html(output_path, &html);
+        let buf = read_file(input_path);
+        let html = md_parse(&buf);
+
+        write_html(output_path, &html);
+    } else {
+        println!("Invalid args");
+    }
 }
